@@ -106,7 +106,8 @@ def bollinger_bands(series, window, num_std=2):
     std_dev = series.rolling(window=window).std()
     upper_band = middle_band + (std_dev * num_std)
     lower_band = middle_band - (std_dev * num_std)
-    return pd.DataFrame({'Middle Band': middle_band, 'Upper Band': upper_band, 'Lower Band': lower_band})
+    return pd.DataFrame({'Middle Band': middle_band, 'Upper Band': upper_band,
+                         'Lower Band': lower_band})
 
 
 def macd(series, fast_period=12, slow_period=26, signal_period=9):

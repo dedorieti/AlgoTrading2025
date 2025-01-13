@@ -8,11 +8,43 @@ from sklearn.metrics import accuracy_score, roc_auc_score
 import math
 
 # Define the tickers and the time period
-tickers = ["AAPL", "MSFT", "GOOG", "AMZN"]
+tickers = ["AAPL", "MSFT", "GOOG", "AMZN", "^VIX", "SPY"]
 period = "6mo"  # 6 months
 
 data = yf.download(tickers, period=period)
 data = calc_technical_indicators(data)
+
+pd.concat([bollinger_bands(data['AAPL']['Close'], window=14), data['AAPL']['Close']], axis=1)
+
+# Generate trading signals
+# Organize all trading signals in a pandas df
+all_signals = []
+
+# Create a new series with 1, -1, or 0 based on RSI values
+signal_rsi['RSI'] = data['AAPL']['RSI'].apply(lambda x: 1 if x > 70 else (-1 if x < 30 else 0))
+# signal_rsi.rename('rsi', inplace=True)
+
+# Generate signal for the bollinger bands
+# define a function for the signal
+def generate_bb_signal(data):
+    df = pd.concat([data['AAPL']['Close'], data['AAPL']['Bollinger_Bands'], ], axis=1)
+    df.dropna(inplace=True)
+
+    # Create a new column 'Signal' initialized to 0 (hold)
+    df['Bollinger_Bands'] = 0
+
+    # Buy signal when price touches or goes below the lower band
+    df.loc[df['Close'] <= df['Lower Band'], 'Bollinger_Bands'] = 1
+
+    # Sell signal when price touches or goes above the upper band
+    df.loc[df['Close'] >= df['Upper Band'], 'Bollinger_Bands'] = -1
+
+    # Keep only the signal column
+    df = df[['Bollinger_Bands']]
+
+    return df
+
+generate_bb_signal(data)
 
 # Combine all required features in a data frame
 df = pd.concat([data['AAPL']['Close'],
