@@ -17,12 +17,13 @@ data = calc_technical_indicators(data)
 pd.concat([bollinger_bands(data['AAPL']['Close'], window=14), data['AAPL']['Close']], axis=1)
 
 # Generate trading signals
+# 1 = buy, -1 = sell, 0 = hold current position
 # Organize all trading signals in a pandas df
-all_signals = []
+all_signals = pd.DataFrame()
 
-# Create a new series with 1, -1, or 0 based on RSI values
-signal_rsi['RSI'] = data['AAPL']['RSI'].apply(lambda x: 1 if x > 70 else (-1 if x < 30 else 0))
-# signal_rsi.rename('rsi', inplace=True)
+# Define trading signals for multiple indicators
+# RSI
+all_signals['RSI'] = data['AAPL']['RSI'].apply(lambda x: 1 if x > 70 else (-1 if x < 30 else 0))
 
 # Generate signal for the bollinger bands
 # define a function for the signal
